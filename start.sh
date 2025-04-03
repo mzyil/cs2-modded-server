@@ -5,7 +5,7 @@
 # Useful for testing and modifying files on the server
 
 # As root (sudo su)
-# cd / && curl -s -H "Cache-Control: no-cache" -o "start.sh" "https://raw.githubusercontent.com/kus/cs2-modded-server/master/start.sh" && chmod +x start.sh && bash start.sh
+# cd / && curl -s -H "Cache-Control: no-cache" -o "start.sh" "https://raw.githubusercontent.com/mzyil/cs2-modded-server/master/start.sh" && chmod +x start.sh && bash start.sh
 
 METADATA_URL="${METADATA_URL:-http://metadata.google.internal/computeMetadata/v1/instance/attributes}"
 
@@ -175,7 +175,7 @@ else
 fi
 
 # Download latest stop script
-curl -s -H "Cache-Control: no-cache" -o "stop.sh" "https://raw.githubusercontent.com/kus/cs2-modded-server/${BRANCH}/stop.sh" && chmod +x stop.sh
+curl -s -H "Cache-Control: no-cache" -o "stop.sh" "https://raw.githubusercontent.com/mzyil/cs2-modded-server/${BRANCH}/stop.sh" && chmod +x stop.sh
 
 PUBLIC_IP=$(curl -4 ifconfig.me)
 

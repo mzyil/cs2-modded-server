@@ -1,15 +1,21 @@
 #!/usr/bin/env bash
 
 # As root (sudo su)
-# cd / && curl -s -H "Cache-Control: no-cache" -o "install.sh" "https://raw.githubusercontent.com/kus/cs2-modded-server/master/install.sh" && chmod +x install.sh && bash install.sh
+# cd / && curl -s -H "Cache-Control: no-cache" -o "install.sh" "https://raw.githubusercontent.com/mzyil/cs2-modded-server/master/install.sh" && chmod +x install.sh && bash install.sh
 
 # Variables
 user="steam"
+HOME_FOLDER="/home/${user}"
 BRANCH="master"
 
 # Check if MOD_BRANCH is set and not empty
 if [ -n "$MOD_BRANCH" ]; then
     BRANCH="$MOD_BRANCH"
+fi
+
+# check if home folder is set
+if [ -n "$USER_HOME_FOLDER" ]; then
+    HOME_FOLDER="$USER_HOME_FOLDER"
 fi
 
 CUSTOM_FILES="${CUSTOM_FOLDER:-custom_files}"
@@ -132,10 +138,10 @@ else
 fi
 
 # Download latest stop script
-curl -s -H "Cache-Control: no-cache" -o "stop.sh" "https://raw.githubusercontent.com/kus/cs2-modded-server/${BRANCH}/stop.sh" && chmod +x stop.sh
+curl -s -H "Cache-Control: no-cache" -o "stop.sh" "https://raw.githubusercontent.com/mzyil/cs2-modded-server/${BRANCH}/stop.sh" && chmod +x stop.sh
 
 # Download latest start script
-curl -s -H "Cache-Control: no-cache" -o "start.sh" "https://raw.githubusercontent.com/kus/cs2-modded-server/${BRANCH}/start.sh" && chmod +x start.sh
+curl -s -H "Cache-Control: no-cache" -o "start.sh" "https://raw.githubusercontent.com/mzyil/cs2-modded-server/${BRANCH}/start.sh" && chmod +x start.sh
 
 PUBLIC_IP=$(dig -4 +short myip.opendns.com @resolver1.opendns.com)
 
@@ -153,11 +159,12 @@ echo "Checking $user user exists..."
 getent passwd ${user} >/dev/null 2&>1
 if [ "$?" -ne "0" ]; then
 	echo "Adding $user user..."
-	addgroup ${user} && \
-	adduser --system --home /home/${user} --shell /bin/false --ingroup ${user} ${user} && \
-	usermod -a -G tty ${user} && \
-	mkdir -m 777 /home/${user}/cs2 && \
-	chown -R ${user}:${user} /home/${user}/cs2
+    addgroup ${user} && \
+        adduser --system --home ${HOME_FOLDER} --shell /bin/false --ingroup ${user} ${user} && \
+        usermod -a -G tty ${user} && \
+        usermod -a -G diskers ${user} && \
+        mkdir -m 777 ${HOME_FOLDER}/cs2 && \
+        chown -R ${user}:${user} ${HOME_FOLDER}/cs2
 	if [ "$?" -ne "0" ]; then
 		echo "ERROR: Cannot add user $user..."
 		exit 1
@@ -183,56 +190,56 @@ sudo -u $user /steamcmd/steamcmd.sh \
   +api_logging 1 1 \
   +@sSteamCmdForcePlatformType linux \
   +@sSteamCmdForcePlatformBitness $BITS \
-  +force_install_dir /home/${user}/cs2 \
+  +force_install_dir ${HOME_FOLDER}/cs2 \
   +login anonymous \
   +app_update 730 \
   +quit
 
-cd /home/${user}
+cd ${HOME_FOLDER}
 
 mkdir -p /root/.steam/sdk32/
 ln -s /steamcmd/linux32/steamclient.so /root/.steam/sdk32/
 mkdir -p /root/.steam/sdk64/
 ln -s /steamcmd/linux64/steamclient.so /root/.steam/sdk64/
 
-mkdir -p /home/${user}/.steam/sdk32/
-ln -s /steamcmd/linux32/steamclient.so /home/${user}/.steam/sdk32/
-mkdir -p /home/${user}/.steam/sdk64/
-ln -s /steamcmd/linux64/steamclient.so /home/${user}/.steam/sdk64/
+mkdir -p ${HOME_FOLDER}/.steam/sdk32/
+ln -s /steamcmd/linux32/steamclient.so ${HOME_FOLDER}/.steam/sdk32/
+mkdir -p ${HOME_FOLDER}/.steam/sdk64/
+ln -s /steamcmd/linux64/steamclient.so ${HOME_FOLDER}/.steam/sdk64/
 
 if [ "${DISTRO_OS}" == "Ubuntu" ]; then
 	if [ "${DISTRO_VERSION}" == "22.04" ]; then
 		# https://forums.alliedmods.net/showthread.php?t=336183
-		rm /home/${user}/cs2/bin/libgcc_s.so.1
+		rm ${HOME_FOLDER}/cs2/bin/libgcc_s.so.1
 	fi
 fi
 
 # Delete addons folder as if we remove something later in git it won't get deleted
-rm -r /home/${user}/cs2/game/csgo/addons
+rm -r ${HOME_FOLDER}/cs2/game/csgo/addons
 
 echo "Downloading mod files..."
-wget --quiet https://github.com/kus/cs2-modded-server/archive/${BRANCH}.zip
+wget --quiet https://github.com/mzyil/cs2-modded-server/archive/${BRANCH}.zip
 unzip -o -qq ${BRANCH}.zip
 # Delete custom_files_example as I use this for my server and as a demo for others and I want it to always reflect git
-rm -r /home/${user}/cs2/custom_files_example/
-cp -R cs2-modded-server-${BRANCH}/custom_files_example/ /home/${user}/cs2/custom_files_example/
+rm -r ${HOME_FOLDER}/cs2/custom_files_example/
+cp -R cs2-modded-server-${BRANCH}/custom_files_example/ ${HOME_FOLDER}/cs2/custom_files_example/
 # Merge mod files into server files
-cp -R cs2-modded-server-${BRANCH}/game/csgo/ /home/${user}/cs2/game/
+cp -R cs2-modded-server-${BRANCH}/game/csgo/ ${HOME_FOLDER}/cs2/game/
 # Merge custom files into server files
-if [ ! -d "/home/${user}/cs2/custom_files/" ]; then
+if [ ! -d "${HOME_FOLDER}/cs2/custom_files/" ]; then
     # If the target directory doesn't exist, copy the source directory to the target location
-    cp -R cs2-modded-server-${BRANCH}/custom_files/ /home/${user}/cs2/custom_files/
+    cp -R cs2-modded-server-${BRANCH}/custom_files/ ${HOME_FOLDER}/cs2/custom_files/
 else
     # If the target directory exists, copy all the contents of the source directory to the target directory
-    cp -RT cs2-modded-server-${BRANCH}/custom_files/ /home/${user}/cs2/custom_files/
+    cp -RT cs2-modded-server-${BRANCH}/custom_files/ ${HOME_FOLDER}/cs2/custom_files/
 fi
 
 echo "Merging in custom files from ${CUSTOM_FILES}"
-cp -RT /home/${user}/cs2/${CUSTOM_FILES}/ /home/${user}/cs2/game/csgo/
+cp -RT ${HOME_FOLDER}/cs2/${CUSTOM_FILES}/ ${HOME_FOLDER}/cs2/game/csgo/
 
-chown -R ${user}:${user} /home/${user}/cs2
+chown -R ${user}:${user} ${HOME_FOLDER}/cs2
 
-cd /home/${user}/cs2
+cd ${HOME_FOLDER}/cs2
 
 # Define the file name
 FILE="game/csgo/gameinfo.gi"
@@ -258,7 +265,7 @@ else
     echo "$FILE successfully patched for Metamod."
 fi
 
-rm -r /home/${user}/cs2-modded-server-${BRANCH} /home/${user}/${BRANCH}.zip
+rm -r ${HOME_FOLDER}/cs2-modded-server-${BRANCH} ${HOME_FOLDER}/${BRANCH}.zip
 
 echo "Starting server on $PUBLIC_IP:$PORT"
 # https://developer.valvesoftware.com/wiki/Counter-Strike_2/Dedicated_Servers#Command-Line_Parameters

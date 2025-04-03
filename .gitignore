@@ -2,6 +2,7 @@
 /server/
 /steamcmd/
 .env copy
+.cs2env
 /custom_files/*
 cs2
 tmp

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # As root (sudo su)
-# cd / && curl -s -H "Cache-Control: no-cache" -o "run.sh" "https://raw.githubusercontent.com/kus/cs2-modded-server/master/run.sh" && chmod +x run.sh && bash run.sh
+# cd / && curl -s -H "Cache-Control: no-cache" -o "run.sh" "https://raw.githubusercontent.com/mzyil/cs2-modded-server/master/run.sh" && chmod +x run.sh && bash run.sh
 
 
 user="steam"

@@ -157,18 +157,32 @@ fi
 
 echo "Checking $user user exists..."
 getent passwd ${user} >/dev/null 2&>1
-if [ "$?" -ne "0" ]; then
-    echo "Adding $user user..."
-    addgroup ${user} && \
-        adduser --system --home ${HOME_FOLDER} --shell /bin/false --ingroup ${user} ${user} && \
-        usermod -a -G tty ${user} && \
-        usermod -a -G diskers ${user} && \
-        mkdir -m 777 ${HOME_FOLDER}/cs2 && \
-        chown -R ${user}:${user} ${HOME_FOLDER}/cs2
+check_return() {
     if [ "$?" -ne "0" ]; then
-        echo "ERROR: Cannot add user $user..."
+        echo "ERROR: $1"
         exit 1
     fi
+}
+
+if [ "$?" -ne "0" ]; then
+    echo "Adding $user user..."
+    addgroup ${user}
+    check_return "Failed to add group ${user}"
+    
+    adduser --system --home ${HOME_FOLDER} --shell /bin/false --ingroup ${user} ${user}
+    check_return "Failed to add user ${user}"
+    
+    usermod -a -G tty ${user}
+    check_return "Failed to add ${user} to tty group"
+    
+    usermod -a -G diskers ${user}
+    check_return "Failed to add ${user} to diskers group"
+    
+    mkdir -m 777 ${HOME_FOLDER}/cs2
+    check_return "Failed to create directory ${HOME_FOLDER}/cs2"
+    
+    chown -R ${user}:${user} ${HOME_FOLDER}/cs2
+    check_return "Failed to set ownership for ${HOME_FOLDER}/cs2"
 fi
 
 echo "Checking steamcmd exists..."
@@ -186,11 +200,11 @@ chown -R ${user}:${user} /steamcmd
 
 echo "Downloading any updates for CS2..."
 # https://developer.valvesoftware.com/wiki/Command_line_options
-sudo -u $user /steamcmd/steamcmd.sh \
+sudo -u $user /usr/games/steamcmd \
   +api_logging 1 1 \
   +@sSteamCmdForcePlatformType linux \
-  +@sSteamCmdForcePlatformBitness $BITS \
-  +force_install_dir ${HOME_FOLDER}/cs2 \
+  +@sSteamCmdForcePlatformBitness 64 \
+  +force_install_dir /mnt/ebs2/steam/cs2 \
   +login anonymous \
   +app_update 730 \
   +quit

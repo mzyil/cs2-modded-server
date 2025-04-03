@@ -7,6 +7,14 @@
 user="steam"
 HOME_FOLDER=$(getent passwd $user | cut -d: -f6)
 
+# Load environment variables from.env file
+if [ -f ".cs2env" ]; then
+    source .cs2env
+else
+    echo "Error:.cs2env file not found. Please create a.env file with required variables."
+    exit 1
+fi
+
 # check if home folder is set
 if [ -n "$USER_HOME_FOLDER" ]; then
     HOME_FOLDER="$USER_HOME_FOLDER"
@@ -39,7 +47,7 @@ fi
 
 echo "Downloading any updates for CS2..."
 # https://developer.valvesoftware.com/wiki/Command_line_options
-sudo -u $user /steamcmd/steamcmd.sh \
+sudo -u $user /usr/games/steamcmd \
   +api_logging 1 1 \
   +@sSteamCmdForcePlatformType linux \
   +@sSteamCmdForcePlatformBitness $BITS \

@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# curl --silent -H "Cache-Control: no-cache" --output "install_local.sh" "https://raw.githubusercontent.com/mzyil/cs2-modded-server/custom-ec2/install_local.sh" && chmod +x install_local.sh && bash install_local.sh
+
 # Load environment variables from.env file
 if [ -f ".cs2env" ]; then
     source .cs2env

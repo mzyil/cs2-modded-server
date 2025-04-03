@@ -5,7 +5,7 @@
 
 # Variables
 user="steam"
-HOME_FOLDER="/home/${user}"
+HOME_FOLDER=$(getent passwd $user | cut -d: -f6)
 BRANCH="master"
 
 # Check if MOD_BRANCH is set and not empty
@@ -267,9 +267,4 @@ fi
 
 rm -r ${HOME_FOLDER}/cs2-modded-server-${BRANCH} ${HOME_FOLDER}/${BRANCH}.zip
 
-echo "Starting server on $PUBLIC_IP:$PORT"
-# https://developer.valvesoftware.com/wiki/Counter-Strike_2/Dedicated_Servers#Command-Line_Parameters
-cmd="./game/bin/linuxsteamrt64/cs2 -dedicated -console -usercon -autoupdate -tickrate $TICKRATE $IP_ARGS -port $PORT +map de_dust2 +sv_visiblemaxplayers $MAXPLAYERS -authkey $API_KEY +sv_setsteamaccount $STEAM_ACCOUNT +game_type 0 +game_mode 0 +mapgroup mg_active +sv_lan $LAN +sv_password $SERVER_PASSWORD +rcon_password $RCON_PASSWORD +exec $EXEC"
-echo $cmd
-sudo -u $user tmux new-session -d -s cs2server "$cmd"
-echo "Server started in tmux session 'cs2server'."
+exec run.sh

@@ -5,6 +5,13 @@
 
 
 user="steam"
+HOME_FOLDER=$(getent passwd $user | cut -d: -f6)
+
+# check if home folder is set
+if [ -n "$USER_HOME_FOLDER" ]; then
+    HOME_FOLDER="$USER_HOME_FOLDER"
+fi
+
 PUBLIC_IP=$(dig +short myip.opendns.com @resolver1.opendns.com)
 
 # 32 or 64 bit Operating System
@@ -36,49 +43,16 @@ sudo -u $user /steamcmd/steamcmd.sh \
   +api_logging 1 1 \
   +@sSteamCmdForcePlatformType linux \
   +@sSteamCmdForcePlatformBitness $BITS \
-  +force_install_dir /home/${user}/cs2 \
+  +force_install_dir ${HOME_FOLDER}/cs2 \
   +login anonymous \
   +app_update 730 \
   +quit
 
-cd /home/${user}/cs2
+cd ${HOME_FOLDER}/cs2
 
 echo "Starting server on $PUBLIC_IP:$PORT"
-echo ./game/bin/linuxsteamrt64/cs2 \
-    -dedicated \
-    -console \
-    -usercon \
-    -autoupdate \
-    -tickrate $TICKRATE \
-	$IP_ARGS \
-    -port $PORT \
-    +map de_dust2 \
-    +sv_visiblemaxplayers $MAXPLAYERS \
-    -authkey $API_KEY \
-    +sv_setsteamaccount $STEAM_ACCOUNT \
-    +game_type 0 \
-    +game_mode 0 \
-    +mapgroup mg_active \
-    +sv_lan $LAN \
-	+sv_password $SERVER_PASSWORD \
-	+rcon_password $RCON_PASSWORD \
-	+exec $EXEC
-sudo -u $user ./game/bin/linuxsteamrt64/cs2 \
-    -dedicated \
-    -console \
-    -usercon \
-    -autoupdate \
-    -tickrate $TICKRATE \
-	$IP_ARGS \
-    -port $PORT \
-    +map de_dust2 \
-    +sv_visiblemaxplayers $MAXPLAYERS \
-    -authkey $API_KEY \
-    +sv_setsteamaccount $STEAM_ACCOUNT \
-    +game_type 0 \
-    +game_mode 0 \
-    +mapgroup mg_active \
-    +sv_lan $LAN \
-	+sv_password $SERVER_PASSWORD \
-	+rcon_password $RCON_PASSWORD \
-	+exec $EXEC
+# https://developer.valvesoftware.com/wiki/Counter-Strike_2/Dedicated_Servers#Command-Line_Parameters
+cmd="./game/bin/linuxsteamrt64/cs2 -dedicated -console -usercon -autoupdate -tickrate $TICKRATE $IP_ARGS -port $PORT +map de_dust2 +sv_visiblemaxplayers $MAXPLAYERS -authkey $API_KEY +sv_setsteamaccount $STEAM_ACCOUNT +game_type 0 +game_mode 0 +mapgroup mg_active +sv_lan $LAN +sv_password $SERVER_PASSWORD +rcon_password $RCON_PASSWORD +exec $EXEC"
+echo $cmd
+sudo -u $user tmux new-session -d -s cs2server "$cmd"
+echo "Server started in tmux session 'cs2server'."

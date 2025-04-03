@@ -8,14 +8,6 @@ else
     exit 1
 fi
 
-# Check bare minimum dependencies
-# Check if curl is installed
-if! command -v curl &> /dev/null
-then
-    echo "Warning: curl is not installed. Please install it to continue. sudo apt update && sudo apt install curl"
-    exit 1
-fi
-
 # Set environment variables with default values if not set in.env file
 export RCON_PASSWORD="${RCON_PASSWORD:-changeme}"
 export API_KEY="${API_KEY:-changeme}"

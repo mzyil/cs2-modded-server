@@ -17,34 +17,19 @@ then
 fi
 
 # Set environment variables with default values if not set in.env file
-RCON_PASSWORD="${RCON_PASSWORD:-changeme}"
-API_KEY="${API_KEY:-changeme}"
-STEAM_ACCOUNT="${STEAM_ACCOUNT:-}"
-MOD_BRANCH="${MOD_BRANCH:-master}"
-SERVER_PASSWORD="${SERVER_PASSWORD:-}"
-PORT="${PORT:-27015}"
-TICKRATE="${TICKRATE:-128}"
-MAXPLAYERS="${MAXPLAYERS:-32}"
-LAN="${LAN:-0}"
-EXEC="${EXEC:-on_boot.cfg}"
-DUCK_DOMAIN="${DUCK_DOMAIN:-}"
-DUCK_TOKEN="${DUCK_TOKEN:-}"
-CUSTOM_FOLDER="${CUSTOM_FOLDER:-}"
-
-# Export environment variables
-export RCON_PASSWORD
-export API_KEY
-export STEAM_ACCOUNT
-export MOD_BRANCH
-export SERVER_PASSWORD
-export PORT
-export TICKRATE
-export MAXPLAYERS
-export LAN
-export EXEC
-export DUCK_DOMAIN
-export DUCK_TOKEN
-export CUSTOM_FOLDER
+export RCON_PASSWORD="${RCON_PASSWORD:-changeme}"
+export API_KEY="${API_KEY:-changeme}"
+export STEAM_ACCOUNT="${STEAM_ACCOUNT:-}"
+export MOD_BRANCH="${MOD_BRANCH:-master}"
+export SERVER_PASSWORD="${SERVER_PASSWORD:-}"
+export PORT="${PORT:-27015}"
+export TICKRATE="${TICKRATE:-128}"
+export MAXPLAYERS="${MAXPLAYERS:-32}"
+export LAN="${LAN:-0}"
+export EXEC="${EXEC:-on_boot.cfg}"
+export DUCK_DOMAIN="${DUCK_DOMAIN:-}"
+export DUCK_TOKEN="${DUCK_TOKEN:-}"
+export CUSTOM_FOLDER="${CUSTOM_FOLDER:-}"
 
 cd /
 
